@@ -1,44 +1,24 @@
-from dotenv import load_dotenv
-load_dotenv()
-
-import logging
-import os
-import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.api.routers.chat import chat_router
-
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from chat import startupSequence
 
 app = FastAPI()
 
-environment = os.getenv("ENVIRONMENT", "dev")  # Default to 'development' if not set
+class DataModel(BaseModel):
+    data: str
 
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
+templates = Jinja2Templates(directory="templates")
 
-if environment == "dev":
-    logger = logging.getLogger("uvicorn")
-    logger.warning("Running in development mode - allowing CORS for all origins")
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+@app.get("/", response_class=HTMLResponse)
+async def get_form(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-
-@app.get("/", tags=["root"])
-async def read_root() -> dict:
-    return {"message": "Welcome to your todo list."}
-    
-app.include_router(chat_router, prefix="/api/chat")
-
-
-if __name__ == "__main__":
-    app_host = os.getenv("APP_HOST", "0.0.0.0")
-    app_port = int(os.getenv("APP_PORT", "8000"))
-    reload = True if environment == "dev" else False
-    uvicorn.run(app="main:app", host=app_host, port=app_port, reload=reload)
+@app.post("/send")
+async def receive_data(item: DataModel):
+    data = item.data
+    manager = startupSequence()
+    response = manager.chat(data)
+    return {"message": f"{response}"}

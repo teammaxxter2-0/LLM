@@ -24,4 +24,4 @@ else
     echo ".env found."
 fi
 pip install -r requirements.txt
-python main.py
+python -m uvicorn main:app --reload
