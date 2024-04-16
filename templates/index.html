@@ -11,29 +11,41 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            height: auto;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
         }
         .input-container {
-            text-align: center;
             background-color: #fff;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             width: 50vw;
+            height: auto;
+            overflow-y: auto;
         }
         textarea {
             padding: 10px;
             font-size: 23px;
-            height: 10vh;
-            border: 2px solid #ccc;
+            height: auto;
             border-radius: 5px;
             margin-bottom: 10px;
             width: 100%;
             box-sizing: border-box;
         }
-        button {
+        #logContainer {
+            background-color: #f9f9f9;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            padding: 10px;
+            width: 50vw;
+            margin: 0 auto; /* Center horizontally */
+        }
+		button {
             padding: 16px 20px;
             width: 50vw;
             font-size: 16px;
@@ -43,52 +55,88 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+			margin-bottom: 10px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #225024;
         }
-        .output-box {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 2px solid #ccc;
+        .user-message {
+            background-color: #4CAF50;
+            color: white;
             border-radius: 5px;
-            text-align: left;
-            font-size: 23px;
-            line-height: 1.5;
-            color: #333;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .log-container {
+            background-color: #5390fe;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
         }
     </style>
+
 </head>
 <body>
-<div class="input-container">
+<div class="input-container" id="logContainer">
     <h2 style="margin-top: 0;">KeukenGPT</h2>
     <textarea id="inputBox" placeholder="Enter something here"></textarea>
     <button onclick="sendData()">Send</button>
-    <div class="output-box" id="outputBox"></div>
+	<hr>
+    <div class="output-box" id="outputBox">
+	    <div class="log-container">Assistent: Hallo! Hoe kan ik je vandaag helpen met betrekking tot onze keukenbladen?
+		</div>
+		</div>
 </div>
 
 <script>
-    async function sendData() {
-        const inputValue = document.getElementById('inputBox').value;
-        const response = await fetch('/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({data: inputValue})
-        });
-        if (response.ok) {
-            const jsonResponse = await response.json();
-            displayOutput(`<strong>Sent:</strong> ${inputValue}<br><strong>Response:</strong> ${jsonResponse.message}`);
-        } else {
-            displayOutput('<strong>Error:</strong> Failed to send data');
-        }
+    let ws = new WebSocket(`ws://${window.location.host}/ws`);
+
+    ws.onopen = function(event) {
+        console.log("WebSocket connection established.");
+    };
+
+    ws.onerror = function(error) {
+        console.error("WebSocket error:", error);
+    };
+
+    function getTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
 
-    function displayOutput(message) {
-        document.getElementById('outputBox').innerHTML = message;
+    function appendUserMessage(message) {
+        const logContainer = document.getElementById('outputBox');
+        const messageBox = document.createElement('div');
+        const timestamp = getTime();
+        messageBox.classList.add('user-message');
+        messageBox.textContent = `${timestamp} - U: ${message}`;
+        logContainer.insertBefore(messageBox, logContainer.firstChild);
     }
+
+    function appendBotMessage(message) {
+        const logContainer = document.getElementById('outputBox');
+        const messageBox = document.createElement('div');
+        const timestamp = getTime();
+        messageBox.classList.add('log-container');
+        messageBox.textContent = `${timestamp} - Assistent: ${message}`;
+        logContainer.insertBefore(messageBox, logContainer.firstChild);
+    }
+
+    async function sendData() {
+        const inputValue = document.getElementById('inputBox').value;
+        appendUserMessage(inputValue);
+        ws.send(inputValue);
+        document.getElementById('inputBox').value = '';
+    }
+
+    ws.onmessage = function(event) {
+        appendBotMessage(event.data);
+    };
 </script>
+
+
 </body>
 </html>

@@ -18,7 +18,8 @@ class OpenAiManager:
         self.json = ""
 
         try:
-            API = "INSERT API" #TODO: .ENV
+            load_dotenv()
+            API = os.environ.get('API_KEY')
             self.client = OpenAI(api_key=API)
         except TypeError:
             exit("No OPENAI_API_KEY")
@@ -48,11 +49,11 @@ class OpenAiManager:
         openai_answer = completion.choices[0].message.content
         if "Bedankt voor het bevestigen van de offerte." in openai_answer:
             print("Offerte wordt gemaakt...")
-            return "reset"
-
-        self.convert_to_json(openai_answer)
-        if "offerte bevestigen" in openai_answer:
-            self.json = self.convert_to_json(openai_answer)
+            filename =  datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
+            with open(filename, "w") as file:
+                self.json = self.convert_to_json(openai_answer)
+                file.write(self.json)
+            file.close
         return openai_answer
 
     # If the user wants a quote, returns json for pdf creation.
