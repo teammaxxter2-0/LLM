@@ -8,7 +8,7 @@ if [ ! -f ".env" ]; then
     echo "MODEL=gpt-4-turbo-preview" >> .env
 	echo "" >> .env
 	echo "# OpenAI's API Key" >> .env
-	echo "OPENAI_API_KEY=sk-insertkeyhere" >> .env
+	echo "API_KEY=sk-insertkeyhere" >> .env
 	echo "" >> .env
 	echo "# Default host location" >> .env
 	echo "APP_HOST=0.0.0.0" >> .env
