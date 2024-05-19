@@ -1,4 +1,5 @@
 const { OpenAI } = require('openai');
+const {json} = require("express");
 require('dotenv').config();
 
 class OpenAiManager {
@@ -19,7 +20,7 @@ class OpenAiManager {
         this.startupSequence();
     }
 
-    async chat(prompt = "") {
+    async chat(prompt) {
         if (!prompt) {
             console.log("Didn't receive input!");
             return;
@@ -43,6 +44,7 @@ class OpenAiManager {
             // Write JSON to file
             // fs.writeFileSync(filename, this.json);
         }
+        console.log(this.chatHistory);
         return openaiAnswer;
     }
 
@@ -91,8 +93,8 @@ class OpenAiManager {
     }
 
     async startupSequence() {
-        this.dbInfo = (//await fetch("http://localhost:5018/Options")).json();
-        {
+        this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
+        /*{
             "Materiaalsoort": "Noble Desiree Grey Matt",
             "Spatrand": "0-150mm",
             "Vensterbank": "150 mm+",
@@ -112,11 +114,11 @@ class OpenAiManager {
             "WCD": "€ 13.50",
             "Achterwand p/m": "€ 309.40",
             "Randafwerking p/m": "€ 28.00"
-        });
+        })*/;
     
         const FIRST_SYSTEM_MESSAGE = { "role": "system", "content": `
         [1] Je bent een bot gemaakt voor het beantwoorden van vragen over de producten die wij verkopen.
-        [2] Wij als bedrijv verkopen keukebladen.
+        [2] Wij als bedrijf verkopen keukenbladen.
         [3] Als iemand een vraag heeft over een onderdeel probeer je zo veel mogenlijk te helpen.
         [4] Alle koste zijn gefixeerd en kunnen niet veranderd worden.
         [5] Nooit kortingen geven.
@@ -124,7 +126,7 @@ class OpenAiManager {
             meld dat het niet in onze catalogus staat en geef een alternatief.
         [7] Als iemand een vraag stelt die niet over een product gaat, 
             meld dat het niet over een product gaat en geef een alternatief.
-        [8] Indien er informatie mist zoals de maten vraag voor de maten.
+        [8] Indien er informatie mist zoals de maten, vraag naar de maten.
         [9] Als iemand een materiaalsoort geeft wat dicht in de buurt zit, 
             vraag of het dichtbijzijnde materiaalsoort bedoelt wordt. 
             Voorbeeld zou zijn Noble Desiree Grey wordt Noble Desiree Grey Matt.
@@ -155,10 +157,11 @@ class OpenAiManager {
         [17] Als het bevestigd wordt zeg je: 'Bedankt voor het bevestigen van de offerte.'
         ` };
         this.chatHistory.push(FIRST_SYSTEM_MESSAGE);
+        this.chatHistory.push({"role": "system", "content": "We verkopen deze materiaalsoorten: " + JSON.stringify(this.dbInfo)})
     
-        for (const item in this.dbInfo) {
-            this.chatHistory.push({ "role": "user", "content": `Dit is onderdeel wat we verkopen met alle informatie als gegeven: ${item}` });
-        }
+        // for (const item in this.dbInfo) {
+        //     this.chatHistory.push({ "role": "system", "content": `Dit is onderdeel wat we verkopen met alle informatie als gegeven: ${JSON.stringify(item)}` });
+        // }
     }
 }
 
