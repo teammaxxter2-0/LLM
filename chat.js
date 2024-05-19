@@ -3,8 +3,8 @@ require('dotenv').config();
 
 class OpenAiManager {
     constructor() {
-        this.model = "gpt-4-turbo-preview";
-        this.jsonModel = "gpt-3.5-turbo";
+        this.model = "gpt-4o";
+        this.jsonModel = "gpt-4o";
         this.chatHistory = [];
         this.dbInfo = [];
         this.json = "";
@@ -91,7 +91,8 @@ class OpenAiManager {
     }
 
     async startupSequence() {
-        this.dbInfo = {
+        this.dbInfo = (//await fetch("http://localhost:5018/Options")).json();
+        {
             "Materiaalsoort": "Noble Desiree Grey Matt",
             "Spatrand": "0-150mm",
             "Vensterbank": "150 mm+",
@@ -111,7 +112,7 @@ class OpenAiManager {
             "WCD": "€ 13.50",
             "Achterwand p/m": "€ 309.40",
             "Randafwerking p/m": "€ 28.00"
-        };
+        });
     
         const FIRST_SYSTEM_MESSAGE = { "role": "system", "content": `
         [1] Je bent een bot gemaakt voor het beantwoorden van vragen over de producten die wij verkopen.
