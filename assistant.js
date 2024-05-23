@@ -1,4 +1,5 @@
 const OpenAI = require("openai");
+const fs = require('fs');
 
 class OpenAiManager {
     constructor(newAssistant=false) {
@@ -11,9 +12,8 @@ class OpenAiManager {
             process.exit(1);
         }
 
-        var fs = require('fs');
-        this.instructions = fs.readFileSync('assistant.txt', 'utf8');
-        this.threadInstructions = fs.readFileSync('thread.txt', 'utf8');
+        this.instructions = fs.readFileSync('./instructions/assistant.txt', 'utf8');
+        this.threadInstructions = fs.readFileSync('./instructions/thread.txt', 'utf8');
 
         try {
             this.client = new OpenAI(API_KEY);
@@ -82,10 +82,13 @@ class OpenAiManager {
     }
 
     async createMessage(threadId, message) {
-        this.client.beta.threads.messages.create(threadId,
+        return this.client.beta.threads.messages.create(threadId,
             {role: "user", content: message}
         );
-        return await this.client.beta.threads.runs.createAndPoll(
+    }
+
+    async runThread(threadId) {
+        return this.client.beta.threads.runs.createAndPoll(
             threadId,
             {
                 assistant_id: (await this.myAssistant).id,
