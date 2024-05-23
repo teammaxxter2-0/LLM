@@ -9,7 +9,7 @@ const manager = new OpenAiManager();
 
 app.use(json());
 
-app.post('/start', async (req, res) => {
+app.post('/chat', async (req, res) => {
     try {
         const { data } = req.body;
         const thread = await manager.startThread();
@@ -24,9 +24,10 @@ app.post('/start', async (req, res) => {
     }
 });
 
-app.post('/chat', async (req, res) => {
+app.post('/chat/:id', async (req, res) => {
     try {
-        const { threadId, data } = req.body;
+        const { data } = req.body;
+        const threadId = req.params.id;
         manager.createMessage(threadId, data).then(r => {
             const response = r.data[0];
             const responseValue = response.content[0].text.value;

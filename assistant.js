@@ -2,7 +2,6 @@ const OpenAI = require("openai");
 
 class OpenAiManager {
     constructor(newAssistant=false) {
-        this.model = "gpt-4o";
         this.myAssistant = null;
 
         const API_KEY = process.env.OPENAI_API_KEY;
@@ -35,7 +34,7 @@ class OpenAiManager {
             instructions: this.instructions,
             name: "BlisAI Assistant",
             tools: [],
-            model: this.model,
+            model: "GPT-4o",
             temperature: 0.15,
             top_p: 1,
             response_format: {"type": "json_object"}
