@@ -4,6 +4,8 @@ Ik wil alles terug hebben en niet materialInformatie: null
 Altijd deze variable gebruiken, ook als ik in een andere taal spreek.
 De boolean NeedsVerify is altijd false, tenzij je denkt dat de klant klaar is met de bestelling in te vullen.
 Dan zet je hem op true zodat de andere assistent het kan nakijken.
+Vul altijd alle prijzen in hoe duur iets is per meter of per stuk.
+Vul de totaal prijs ook altijd in, als er niets geselecteerd is of niet is ingevuld zet je 0 neer.
 
 interface Data {
     assistant: AssistantMessage;

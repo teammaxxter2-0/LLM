@@ -150,7 +150,6 @@ class OpenAiManager {
                 instructions: `
                 Dit is onze Database, gebruik dit!
                 Geef een JSON object terug.
-                Vul altijd alle prijzen in. Als iets niet geld kost, vul dan 0 in.
                 ${JSON.stringify(this.threadInstructions)}
             `
             }
