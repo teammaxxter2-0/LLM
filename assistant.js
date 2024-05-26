@@ -2,7 +2,7 @@ const OpenAI = require("openai");
 const fs = require('fs');
 
 class OpenAiManager {
-    constructor(newAssistant=false) {
+    constructor(newAssistant = false) {
         this.myAssistant = null;
 
         const API_KEY = process.env.OPENAI_API_KEY;
@@ -86,7 +86,8 @@ class OpenAiManager {
 
     async startThread() {
         try {
-            this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
+            // this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
+            this.dbInfo = fs.readFileSync('./instructions/DB.json', 'utf8');
             const newThread = await this.client.beta.threads.create();
             return newThread.id;
         } catch (error) {
@@ -109,15 +110,36 @@ class OpenAiManager {
         );
     }
 
-    async verify(threadId, message) {
-        await this.createMessage(threadId, message);
-        return this.client.beta.threads.runs.createAndPoll(
-            threadId,
-            {
+    async verify(message) {
+        let returnMessage = null;
+
+        try {
+            const threadId = await this.startThread();
+            await this.createMessage(threadId, JSON.stringify(message));
+
+            const response = await this.client.beta.threads.runs.createAndPoll(threadId, {
                 assistant_id: (await this.verifyAI).id,
-                instructions: this.threadInstructions + "\nDit is onze Database, gebruik dit!\n" + this.dbInfo
+                instructions: `
+                ${this.threadInstructions}
+                Dit is onze Database, gebruik dit!
+                Als iets niet klopt, pas aan!
+                Als je iets aanpast qua meters, pas dan ook de totaal prijs aan.
+                Als een boolean false is kan het niet geld kosten.
+                ${this.dbInfo}
+            `
+            });
+
+            if (response.status === 'completed') {
+                const messages = await this.listMessages(threadId);
+                returnMessage = messages.data[0].content[0].text.value;
+            } else {
+                console.log(response.status);
             }
-        );
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
+
+        return returnMessage;
     }
 
     async runThread(threadId) {
@@ -125,7 +147,11 @@ class OpenAiManager {
             threadId,
             {
                 assistant_id: (await this.myAssistant).id,
-                instructions: this.threadInstructions
+                instructions: `
+                Dit is onze Database, gebruik dit!
+                Geef een JSON object terug.
+                ${JSON.stringify(this.threadInstructions)}
+            `
             }
         );
     }

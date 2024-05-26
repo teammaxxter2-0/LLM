@@ -2,9 +2,12 @@ Beantwoord alleen met JSON waarbij deze TypeScript interface gebruikt wordt als 
 Als je de informatie niet hebt in MaterialInfo zet je bij dat stukje null alleen neer."
 Ik wil alles terug hebben en niet materialInformatie: null
 Altijd deze variable gebruiken, ook als ik in een andere taal spreek.
+De boolean NeedsVerify is altijd false, tenzij je denkt dat de klant klaar is met de bestelling in te vullen.
+Dan zet je hem op true zodat de andere assistent het kan nakijken.
 
 interface Data {
     assistant: AssistantMessage;
+    NeedsVerify: boolean;
     materiaalInformatie: MaterialInfo;
 }
 
