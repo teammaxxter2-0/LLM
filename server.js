@@ -1,6 +1,6 @@
 const express = require('express');
 const json = require('body-parser').json;
-const {OpenAiManager} = require('./assistant.js');
+const { OpenAiManager } = require('./assistant.js');
 require('dotenv').config();
 
 const app = express();
@@ -11,53 +11,52 @@ app.use(json());
 
 app.post('/chat', async (req, res) => {
     try {
-        const {data} = req.body;
-        const threadId = await manager.startThread()
+        const { data } = req.body;
+        const threadId = await manager.startThread();
         await manager.createMessage(threadId, data);
-        await sendMessageAndReceiveJSON(threadId, data).then((responseValue) => {
-            res.json({message: responseValue, threadId: threadId});
+        const responseValue = await sendMessageAndReceiveJSON(threadId, data);
+        res.json({
+            message: responseValue,
+            threadId: threadId
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Internal Server Error'});
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 app.post('/chat/:id', async (req, res) => {
     try {
-        const {data} = req.body;
+        const { data } = req.body;
         const threadId = req.params.id;
-        await manager.getThread(threadId).then(async (response) => {
-            if (response.error) {
-                await manager.startThread().then(async threadId => {
-                    await sendMessageAndReceiveJSON(threadId, data).then((responseValue) => {
-                        res.json({message: responseValue, threadId: threadId});
-                    });
-                });
-            } else {
-                await sendMessageAndReceiveJSON(threadId, data).then((responseValue) => {
-                    res.json({message: responseValue});
-                });
-            }
-        });
+        const response = await manager.getThread(threadId);
+        let responseValue;
+        let newThreadId = threadId;
+        if (response.error) {
+            newThreadId = await manager.startThread();
+            responseValue = await sendMessageAndReceiveJSON(newThreadId, data);
+            res.json({ message: responseValue, threadId: newThreadId });
+        } else {
+            responseValue = await sendMessageAndReceiveJSON(threadId, data);
+            res.json({ message: responseValue });
+        }
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Internal Server Error'});
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 async function sendMessageAndReceiveJSON(threadId, message) {
     await manager.createMessage(threadId, message);
-    await manager.runThread(threadId).then(async r => {
-        if (r.status === 'completed') {
-            await manager.listMessages(threadId).then(r => {
-                const response = r.data[0];
-                return response.content[0].text.value;
-            });
-        } else {
-            console.log(r.status)
-        }
-    });
+    const runResponse = await manager.runThread(threadId);
+    if (runResponse.status === 'completed') {
+        const messages = await manager.listMessages(threadId);
+        const response = messages.data[0].content[0].text.value;
+        return response;
+    } else {
+        console.log(runResponse.status);
+        return 'Thread is not completed';
+    }
 }
 
 app.listen(port, () => {
