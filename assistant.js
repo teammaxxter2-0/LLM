@@ -86,8 +86,8 @@ class OpenAiManager {
 
     async startThread() {
         try {
-            // this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
-            this.dbInfo = fs.readFileSync('./instructions/DB.json', 'utf8');
+            this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
+            // this.dbInfo = fs.readFileSync('./instructions/DB.json', 'utf8');
             const newThread = await this.client.beta.threads.create();
             return newThread.id;
         } catch (error) {
