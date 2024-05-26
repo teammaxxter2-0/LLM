@@ -148,9 +148,10 @@ class OpenAiManager {
             {
                 assistant_id: (await this.myAssistant).id,
                 instructions: `
+                ${this.threadInstructions}
                 Dit is onze Database, gebruik dit!
                 Geef een JSON object terug.
-                ${JSON.stringify(this.threadInstructions)}
+                ${this.dbInfo}
             `
             }
         );
