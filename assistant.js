@@ -151,6 +151,7 @@ class OpenAiManager {
                 ${this.threadInstructions}
                 Dit is onze Database, gebruik dit!
                 Geef een JSON object terug.
+                Als er iets niet kan, geef false terug en 0 terug bij prijs.
                 ${JSON.stringify(this.dbInfo)}
             `
             }
