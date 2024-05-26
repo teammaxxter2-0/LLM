@@ -67,5 +67,4 @@ async function sendMessageAndReceiveJSON(threadId, message) {
 
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
-    await verifyTest(dummyData);
 });
