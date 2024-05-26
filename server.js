@@ -9,6 +9,18 @@ const manager = new OpenAiManager();
 
 app.use(json());
 
+app.post('/verify', async (req, res) => {
+    try {
+        const {data} = req.body;
+        await manager.verify(data).then((response) => {
+            res.json({message: response});
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+});
+
 app.post('/chat', async (req, res) => {
     try {
         const {data} = req.body;

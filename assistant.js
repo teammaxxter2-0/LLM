@@ -7,6 +7,7 @@ class OpenAiManager {
 
         const API_KEY = process.env.OPENAI_API_KEY;
         const ASSIST_ID = process.env.OPENAI_ASSISTANT_ID;
+        const VERIFY_ID = process.env.OPENAI_VERIFY_ID;
         if (!API_KEY) {
             console.error("No OPENAI_API_KEY");
             process.exit(1);
@@ -14,11 +15,19 @@ class OpenAiManager {
 
         this.instructions = fs.readFileSync('./instructions/assistant.txt', 'utf8');
         this.threadInstructions = fs.readFileSync('./instructions/thread.txt', 'utf8');
+        this.verifyInscructions = fs.readFileSync('./instructions/verify.txt', 'utf8');
 
         try {
             this.client = new OpenAI(API_KEY);
             if (ASSIST_ID) {
                 this.myAssistant = this.getAssistant(ASSIST_ID);
+            } else {
+                console.error("No Assistant");
+                process.exit(1);
+            }
+
+            if (VERIFY_ID) {
+                this.verifyAI = this.getAssistant(VERIFY_ID);
             } else {
                 console.error("No Assistant");
                 process.exit(1);
@@ -29,10 +38,22 @@ class OpenAiManager {
         }
     }
 
-    async createAssistant() {
-        return this.client.beta.assistants.create({
+    async createAssistants() {
+        // WAARSCHUWING: Dit maakt de assistenten aan. Wees zeker dat je dit wilt aanroepen.
+        // Als er al assistenten zijn worden die niet overschreven.
+        const assistant = this.client.beta.assistants.create({
             instructions: this.instructions,
             name: "BlisAI Assistant",
+            tools: [],
+            model: "GPT-4o",
+            temperature: 0.15,
+            top_p: 1,
+            response_format: {"type": "json_object"}
+        });
+
+        const verify = this.client.beta.assistants.create({
+            instructions: this.verifyInscructions,
+            name: "BlisAI Verify",
             tools: [],
             model: "GPT-4o",
             temperature: 0.15,
@@ -65,6 +86,7 @@ class OpenAiManager {
 
     async startThread() {
         try {
+            this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
             const newThread = await this.client.beta.threads.create();
             return newThread.id;
         } catch (error) {
@@ -84,6 +106,17 @@ class OpenAiManager {
     async createMessage(threadId, message) {
         return this.client.beta.threads.messages.create(threadId,
             {role: "user", content: message}
+        );
+    }
+
+    async verify(threadId, message) {
+        await this.createMessage(threadId, message);
+        return this.client.beta.threads.runs.createAndPoll(
+            threadId,
+            {
+                assistant_id: (await this.verifyAI).id,
+                instructions: this.threadInstructions + "\nDit is onze Database, gebruik dit!\n" + this.dbInfo
+            }
         );
     }
 
