@@ -125,7 +125,7 @@ class OpenAiManager {
                 Als iets niet klopt, pas aan!
                 Als je iets aanpast qua meters, pas dan ook de totaal prijs aan.
                 Als een boolean false is kan het niet geld kosten.
-                ${this.dbInfo}
+                ${JSON.stringify(this.dbInfo)}
             `
             });
 
@@ -151,7 +151,7 @@ class OpenAiManager {
                 ${this.threadInstructions}
                 Dit is onze Database, gebruik dit!
                 Geef een JSON object terug.
-                ${this.dbInfo}
+                ${JSON.stringify(this.dbInfo)}
             `
             }
         );
