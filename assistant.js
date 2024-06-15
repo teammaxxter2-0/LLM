@@ -1,5 +1,7 @@
 const OpenAI = require("openai");
 const fs = require('fs');
+const fetch = require('node-fetch');
+
 
 class OpenAiManager {
     constructor(newAssistant = false) {
@@ -86,7 +88,7 @@ class OpenAiManager {
 
     async startThread() {
         try {
-            this.dbInfo = await (await fetch("http://localhost:5018/Options")).json()
+            this.dbInfo = await (await fetch("http://backend:8080/Options")).json()
             // this.dbInfo = fs.readFileSync('./instructions/DB.json', 'utf8');
             const newThread = await this.client.beta.threads.create();
             return newThread.id;
