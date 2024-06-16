@@ -57,8 +57,7 @@ async function sendMessageAndReceiveJSON(threadId, message) {
     const runResponse = await manager.runThread(threadId);
     if (runResponse.status === 'completed') {
         const messages = await manager.listMessages(threadId);
-        const response = messages.data[0].content[0].text.value;
-        return response;
+        return messages.data[0].content[0].text.value;
     } else {
         console.log(runResponse.status);
         return 'Thread is not completed';

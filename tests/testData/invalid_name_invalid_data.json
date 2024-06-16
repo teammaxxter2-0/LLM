@@ -1,0 +1,46 @@
+{
+  "assistant":
+  {
+    "message": "Alle informatie staat in uw winkelmandje. Kunt u kijken of dit klopt?"
+  },
+  "NeedsVerify": true,
+  "materiaalInformatie":
+  {
+    "name": "Marble",
+    "aantal_m2": 0,
+    "prijs_per_m2": 22247.52,
+    "prijs_m2_totaal": 1237.6,
+    "randafwerking": false,
+    "randafwerking_m": 0,
+    "randafwerking_prijs_per_m": 87,
+    "randafwerking_hoogte_mm": 0,
+    "randafwerking_prijs_totaal": 0,
+    "spatrand_m": 3,
+    "spatrand_prijs_per_m": 35,
+    "spatrand_hoogte_mm": 10330,
+    "spatrand_prijs_totaal": 105,
+    "vensterbank_m": 3,
+    "vensterbank_prijs_per_m": 309.4,
+    "vensterbank_breete_mm": 10110,
+    "vensterbank_prijs_totaal": 928.2,
+    "spoelbak": true,
+    "uitsparing_spoelbak": "ruw",
+    "spoelbak_prijs": 732130,
+    "kraangat": true,
+    "kraangat_prijs": 12130.70,
+    "zeepdispenser": true,
+    "zeepdispenser_prijs": 0,
+    "boorgaten": true,
+    "boorgaten_stuk": 1,
+    "bootgaten_mm": 1235,
+    "boorgaten_prijs_per_stuk": 5,
+    "bootgaten_prijs_totaal": 5,
+    "WCD": true,
+    "WCD_prijs": 12313.50,
+    "achterwand": true,
+    "acherwand_m2": 5,
+    "achterwand_prijs_per_m2": 312309.40,
+    "achterwand_prijs_totaal": 1512347,
+    "offerte_prijs_totaal": 3912316
+  }
+}
