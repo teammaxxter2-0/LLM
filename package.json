@@ -4,7 +4,7 @@
   "description": "",
   "main": "chat.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
@@ -17,6 +17,7 @@
     "openai": "^4.45.0"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.0"
   }
 }
