@@ -18,6 +18,7 @@ class OpenAiManager {
         this.instructions = fs.readFileSync('./instructions/assistant.txt', 'utf8');
         this.threadInstructions = fs.readFileSync('./instructions/thread.txt', 'utf8');
         this.verifyInscructions = fs.readFileSync('./instructions/verify.txt', 'utf8');
+        this.dummyData = null;
 
         try {
             this.client = new OpenAI(API_KEY);
@@ -88,8 +89,11 @@ class OpenAiManager {
 
     async startThread() {
         try {
-            this.dbInfo = await (await fetch("http://backend:8080/Options")).json()
-            // this.dbInfo = fs.readFileSync('./instructions/DB.json', 'utf8');
+            if (this.dummyData === null) {
+                this.dbInfo = await (await fetch("http://backend:8080/Options")).json()
+            } else {
+                this.dbInfo = this.dummyData;
+            }
             const newThread = await this.client.beta.threads.create();
             return newThread.id;
         } catch (error) {
@@ -118,7 +122,6 @@ class OpenAiManager {
         try {
             const threadId = await this.startThread();
             await this.createMessage(threadId, JSON.stringify(message));
-
             const response = await this.client.beta.threads.runs.createAndPoll(threadId, {
                 assistant_id: (await this.verifyAI).id,
                 instructions: `
@@ -127,6 +130,9 @@ class OpenAiManager {
                 Als iets niet klopt, pas aan!
                 Als je iets aanpast qua meters, pas dan ook de totaal prijs aan.
                 Als een boolean false is kan het niet geld kosten.
+                Check of de naam bestaat. Als het niet bestaat, kijk naar de prijs van de materialen.
+                Als de prijs_per_m2 overeen komt met de prijs_per_m2 van een bestaand materiaal, verander de naam naar dat materiaal.
+                Als de prijs_per_m2 niet overeen komt met de prijs_per_m2 van een bestaand materiaal, maak alle strings leeg en ints/numbers 0 en booleans false.
                 ${JSON.stringify(this.dbInfo)}
             `
             });

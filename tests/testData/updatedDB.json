@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "Noble Desiree Grey Matt",
+    "spatrand": "0-150 mm",
+    "vensterbank": "150 mm+",
+    "boorgatenPerStuk": true,
+    "wcd": true,
+    "randafwerking": false,
+    "prijsPerM2": 300,
+    "randafwerkingPerM": 87,
+    "spatrandPerM": 35,
+    "vensterbankPerM": 309.4,
+    "uitsparingOnderbouw": 151.5,
+    "uitsparingInleg": 97.5,
+    "uitsparingRuw": 70,
+    "kraangat": 10.7,
+    "zeepdispenser": 10.7,
+    "boorgatenPerStukPrijs": 5,
+    "wcdPrijs": 13.5,
+    "achterwandPerM": 309.4,
+    "randafwerkingPerMPrice": 28
+  }
+]
