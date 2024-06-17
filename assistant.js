@@ -16,6 +16,7 @@ class OpenAiManager {
         this.instructions = fs.readFileSync('./instructions/assistant.txt', 'utf8');
         this.threadInstructions = fs.readFileSync('./instructions/thread.txt', 'utf8');
         this.verifyInscructions = fs.readFileSync('./instructions/verify.txt', 'utf8');
+        this.verifyThreadInscructions = fs.readFileSync('./instructions/verifyThread.txt', 'utf8');
         this.dummyData = null;
 
         try {
@@ -124,13 +125,7 @@ class OpenAiManager {
                 assistant_id: (await this.verifyAI).id,
                 instructions: `
                 ${this.threadInstructions}
-                Dit is onze Database, gebruik dit!
-                Als iets niet klopt, pas aan!
-                Als je iets aanpast qua meters, pas dan ook de totaal prijs aan.
-                Als een boolean false is kan het niet geld kosten.
-                Check of de naam bestaat. Als het niet bestaat, kijk naar de prijs van de materialen.
-                Als de prijs_per_m2 overeen komt met de prijs_per_m2 van een bestaand materiaal, verander de naam naar dat materiaal.
-                Als de prijs_per_m2 niet overeen komt met de prijs_per_m2 van een bestaand materiaal, maak alle strings leeg en ints/numbers 0 en booleans false.
+                ${this.verifyThreadInscructions}
                 ${JSON.stringify(this.dbInfo)}
             `
             });
