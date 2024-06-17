@@ -44,6 +44,11 @@ app.post('/chat/:id', async (req, res) => {
             }
         } else {
             responseValue = await sendMessageAndReceiveJSON(threadId, data);
+			if (responseValue["NeedsVerify"] === true) {
+                const verifiedResponse = await manager.verify(data);
+                const verified = verifiedResponse.data[0].content[0].text.value;
+                res.json({ message: verified });
+            }
             res.json({ message: responseValue });
         }
     } catch (error) {
